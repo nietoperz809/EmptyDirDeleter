@@ -22,7 +22,7 @@ public class EmptyDirDeleter
         {
             pass++;
             System.out.println("Pass: "+pass);
-            EmptyDirDeleter d = new EmptyDirDeleter(new File("E:/"));
+            EmptyDirDeleter d = new EmptyDirDeleter(new File("C:\\Users\\Administrator\\Desktop"));
             if (d.getDels() == 0)
                 break;
         }

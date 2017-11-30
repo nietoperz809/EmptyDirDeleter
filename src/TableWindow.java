@@ -16,7 +16,11 @@ public class TableWindow extends JFrame
         tableModel.addColumn("Deleted");
 
         table = new JTable(tableModel);
-
+        table.getColumnModel().getColumn(0).setMaxWidth(40);
+        table.getColumnModel().getColumn(1).setMaxWidth(1000);
+        table.getColumnModel().getColumn(2).setMaxWidth(150);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+        
         this.add(new JScrollPane(table));
         this.setTitle("Table Example");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

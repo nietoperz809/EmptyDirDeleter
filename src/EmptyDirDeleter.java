@@ -8,32 +8,37 @@ public class EmptyDirDeleter
     }
 
     private int dels;
+    private TableWindow tab;
+    private int pass;
 
-    private EmptyDirDeleter (File dir)
+    public EmptyDirDeleter (File dir, TableWindow tab, int pass)
     {
+        this.pass = pass;
+        this.tab = tab;
         dels = 0;
         run(dir);
     }
 
-    public static void main (String[] args)
-    {
-        int pass = 0;
-        for(;;)
-        {
-            pass++;
-            System.out.println("Pass: "+pass);
-            EmptyDirDeleter d = new EmptyDirDeleter(new File("C:\\Users\\Administrator\\Desktop"));
-            if (d.getDels() == 0)
-                break;
-        }
-    }
+//    public static void main (String[] args)
+//    {
+//        int pass = 0;
+//        for(;;)
+//        {
+//            pass++;
+//            System.out.println("Pass: "+pass);
+//            EmptyDirDeleter d = new EmptyDirDeleter(new File("C:\\Users\\Administrator\\Desktop"));
+//            if (d.getDels() == 0)
+//                break;
+//        }
+//    }
 
     public void run (File dir)
     {
         File[] files = dir.listFiles();
+        tab.addRow(pass, dir.getPath(), "Begin Scan");
         if (files == null)
         {
-            System.out.println("FAIL: "+dir.getPath());
+            tab.addRow(pass, dir.getPath(), "NoAccess!");
             return;
         }
         for (File file : files)
@@ -45,12 +50,17 @@ public class EmptyDirDeleter
         }
         if (files.length == 0)  // empty
         {
-            System.out.println("Empty: "+dir.getPath());
+            String path = dir.getPath();
             if (dir.delete())
             {
-                System.out.println("deleted!");
+                tab.addRow(pass, path, "Deleted!");
                 dels++;
             }
+            else
+            {
+                tab.addRow(pass, path, "NO!!!");
+            }
         }
+        tab.addRow(pass, dir.getPath(), "End Scan");
     }
 }

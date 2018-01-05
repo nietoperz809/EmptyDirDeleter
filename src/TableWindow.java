@@ -59,13 +59,16 @@ public class TableWindow extends JFrame
         {
             pass++;
             System.out.println("Pass: "+pass);
-            File dir = new File("F:\\pron");
+            File dir = new File("F:\\codes");
             sl.addRow (pass, "Starting: "+dir.getPath(),"INFO", Color.CYAN);
             EmptyDirDeleter d = new EmptyDirDeleter(dir, sl, pass);
             int dels = d.getDels();
             sl.addRow (pass, "Files deleted: "+dels,"INFO", Color.MAGENTA);
             if (dels == 0)
+            {
+                System.out.println("Finished.");
                 break;
+            }
         }
     }
 

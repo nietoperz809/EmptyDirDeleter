@@ -1,9 +1,7 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.concurrent.LinkedBlockingDeque;
 
 class SyncObject
 {
@@ -23,8 +21,7 @@ class SyncObject
 
 public class SyncList
 {
-    List<SyncObject> syncal =
-            Collections.synchronizedList(new ArrayList<SyncObject>());
+    LinkedBlockingDeque<SyncObject> syncal = new LinkedBlockingDeque<SyncObject>();
 
     DefaultTableModel model;
     JTable tab;
@@ -36,16 +33,25 @@ public class SyncList
 
         new Thread(() ->
         {
-            for(;;)
+            for (; ; )
             {
-                synchronized (syncal)
+                try
                 {
-                    for (SyncObject so : syncal)
+                    if (syncal.isEmpty())
                     {
+                        tab.changeSelection(tab.getRowCount() - 1, 0, false, false);
+                        Thread.sleep(100);
+                    }
+                    else
+                    {
+                        SyncObject so = syncal.takeLast();
                         ColorString s1 = new ColorString(so.deleted, so.col);
                         model.addRow(new Object[]{so.pass, so.path, s1});
                     }
-                    tab.changeSelection(tab.getRowCount() - 1, 0, false, false);
+                }
+                catch (InterruptedException ex)
+                {
+                    ex.printStackTrace();
                 }
             }
         }).start();
@@ -54,9 +60,6 @@ public class SyncList
     public void addRow (int pass, String path, String deleted, Color col)
     {
         SyncObject so = new SyncObject(pass, path, deleted, col);
-        synchronized (syncal)
-        {
-            syncal.add(so);
-        }
+        syncal.addFirst(so);
     }
 }

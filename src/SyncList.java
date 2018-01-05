@@ -1,0 +1,62 @@
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+class SyncObject
+{
+    int pass;
+    String path;
+    String deleted;
+    Color col;
+
+    public SyncObject (int pass, String path, String deleted, Color col)
+    {
+        this.pass = pass;
+        this.path = path;
+        this.deleted = deleted;
+        this.col = col;
+    }
+}
+
+public class SyncList
+{
+    List<SyncObject> syncal =
+            Collections.synchronizedList(new ArrayList<SyncObject>());
+
+    DefaultTableModel model;
+    JTable tab;
+
+    public SyncList (DefaultTableModel model, JTable tab)
+    {
+        this.model = model;
+        this.tab = tab;
+
+        new Thread(() ->
+        {
+            for(;;)
+            {
+                synchronized (syncal)
+                {
+                    for (SyncObject so : syncal)
+                    {
+                        ColorString s1 = new ColorString(so.deleted, so.col);
+                        model.addRow(new Object[]{so.pass, so.path, s1});
+                    }
+                    tab.changeSelection(tab.getRowCount() - 1, 0, false, false);
+                }
+            }
+        }).start();
+    }
+
+    public void addRow (int pass, String path, String deleted, Color col)
+    {
+        SyncObject so = new SyncObject(pass, path, deleted, col);
+        synchronized (syncal)
+        {
+            syncal.add(so);
+        }
+    }
+}

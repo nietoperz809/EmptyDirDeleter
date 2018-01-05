@@ -1,5 +1,6 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.io.File;
 
 public class TableWindow extends JFrame
@@ -8,7 +9,9 @@ public class TableWindow extends JFrame
     private JTable table;
     private int pass;
 
-    public TableWindow ()
+    private SyncList sl;
+
+    private TableWindow ()
     {
         tableModel = new DefaultTableModel();
         tableModel.addColumn("Pass");
@@ -20,42 +23,47 @@ public class TableWindow extends JFrame
         table.getColumnModel().getColumn(1).setMaxWidth(1000);
         table.getColumnModel().getColumn(2).setMaxWidth(150);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-        
+
+        table.setDefaultRenderer(Object.class, new ColoredTableCellRenderer());
+
+        sl = new SyncList(tableModel, table);
+
         this.add(new JScrollPane(table));
         this.setTitle("Table Example");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
         this.setVisible(true);
         runDirDeleter();
-        addRow (pass, "Finished","INFO!");
+        sl.addRow (pass, "Finished","INFO!", Color.BLUE);
     }
 
-    public void addRow (int pass, String path, String deleted)
-    {
-        tableModel.addRow(new Object[]{pass, path, deleted});
-        table.changeSelection(table.getRowCount() - 1, 0, false, false);
-        try
-        {
-            Thread.sleep(0);
-        }
-        catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
-    }
+//    void addRow (int pass, String path, String deleted, Color col)
+//    {
+//        ColorString s1 = new ColorString(deleted, col);
+//        tableModel.addRow(new Object[]{pass, path, s1});
+//        table.changeSelection(table.getRowCount() - 1, 0, false, false);
+//        try
+//        {
+//            Thread.sleep(0);
+//        }
+//        catch (InterruptedException e)
+//        {
+//            e.printStackTrace();
+//        }
+//    }
 
-    public void runDirDeleter ()
+    private void runDirDeleter ()
     {
         pass = 0;
         for(;;)
         {
             pass++;
             System.out.println("Pass: "+pass);
-            File dir = new File("E:\\");
-            addRow (pass, "Starting: "+dir.getPath(),"INFO");
-            EmptyDirDeleter d = new EmptyDirDeleter(dir, this, pass);
+            File dir = new File("F:\\pron");
+            sl.addRow (pass, "Starting: "+dir.getPath(),"INFO", Color.CYAN);
+            EmptyDirDeleter d = new EmptyDirDeleter(dir, sl, pass);
             int dels = d.getDels();
-            addRow (pass, "Files deleted: "+dels,"INFO");
+            sl.addRow (pass, "Files deleted: "+dels,"INFO", Color.MAGENTA);
             if (dels == 0)
                 break;
         }

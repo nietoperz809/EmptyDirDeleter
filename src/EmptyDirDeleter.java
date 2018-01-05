@@ -1,3 +1,5 @@
+import java.awt.Color;
+
 import java.io.File;
 
 public class EmptyDirDeleter
@@ -8,10 +10,10 @@ public class EmptyDirDeleter
     }
 
     private int dels;
-    private TableWindow tab;
+    private SyncList tab;
     private int pass;
 
-    public EmptyDirDeleter (File dir, TableWindow tab, int pass)
+    public EmptyDirDeleter (File dir, SyncList tab, int pass)
     {
         this.pass = pass;
         this.tab = tab;
@@ -35,10 +37,10 @@ public class EmptyDirDeleter
     public void run (File dir)
     {
         File[] files = dir.listFiles();
-        tab.addRow(pass, dir.getPath(), "Begin Scan");
+        tab.addRow(pass, dir.getPath(), "Begin Scan", Color.ORANGE);
         if (files == null)
         {
-            tab.addRow(pass, dir.getPath(), "NoAccess!");
+            tab.addRow(pass, dir.getPath(), "NoAccess!", Color.RED);
             return;
         }
         for (File file : files)
@@ -53,14 +55,14 @@ public class EmptyDirDeleter
             String path = dir.getPath();
             if (dir.delete())
             {
-                tab.addRow(pass, path, "Deleted!");
+                tab.addRow(pass, path, "Deleted!", Color.PINK);
                 dels++;
             }
             else
             {
-                tab.addRow(pass, path, "NO!!!");
+                tab.addRow(pass, path, "NO!!!", Color.RED);
             }
         }
-        tab.addRow(pass, dir.getPath(), "End Scan");
+        tab.addRow(pass, dir.getPath(), "End Scan", Color.GREEN);
     }
 }

@@ -25,6 +25,7 @@ public class SyncList
 
     DefaultTableModel model;
     JTable tab;
+    volatile boolean stopflag = false;
 
     public SyncList (DefaultTableModel model, JTable tab)
     {
@@ -40,6 +41,8 @@ public class SyncList
                     if (syncal.isEmpty())
                     {
                         tab.changeSelection(tab.getRowCount() - 1, 0, false, false);
+                        if (stopflag)
+                            break;
                         Thread.sleep(100);
                     }
                     else
@@ -61,5 +64,10 @@ public class SyncList
     {
         SyncObject so = new SyncObject(pass, path, deleted, col);
         syncal.addFirst(so);
+    }
+
+    public void stop()
+    {
+        stopflag = true;
     }
 }

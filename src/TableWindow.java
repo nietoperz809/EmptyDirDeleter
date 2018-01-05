@@ -37,21 +37,6 @@ public class TableWindow extends JFrame
         sl.addRow (pass, "Finished","INFO!", Color.BLUE);
     }
 
-//    void addRow (int pass, String path, String deleted, Color col)
-//    {
-//        ColorString s1 = new ColorString(deleted, col);
-//        tableModel.addRow(new Object[]{pass, path, s1});
-//        table.changeSelection(table.getRowCount() - 1, 0, false, false);
-//        try
-//        {
-//            Thread.sleep(0);
-//        }
-//        catch (InterruptedException e)
-//        {
-//            e.printStackTrace();
-//        }
-//    }
-
     private void runDirDeleter ()
     {
         pass = 0;
@@ -59,7 +44,7 @@ public class TableWindow extends JFrame
         {
             pass++;
             System.out.println("Pass: "+pass);
-            File dir = new File("F:\\codes");
+            File dir = new File("F:\\pron");
             sl.addRow (pass, "Starting: "+dir.getPath(),"INFO", Color.CYAN);
             EmptyDirDeleter d = new EmptyDirDeleter(dir, sl, pass);
             int dels = d.getDels();
@@ -67,6 +52,7 @@ public class TableWindow extends JFrame
             if (dels == 0)
             {
                 System.out.println("Finished.");
+                sl.stop();
                 break;
             }
         }

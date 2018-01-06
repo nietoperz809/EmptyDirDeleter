@@ -1,15 +1,20 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.io.File;
 
 public class TableWindow extends JFrame
 {
     private DefaultTableModel tableModel;
     private JTable table;
-    private int pass;
 
-    private SyncList sl;
+    private SyncList listFiller;
+
+    private JButton startButton = new JButton("Start");
+    private JButton stopButton = new JButton("Stop");
+    private boolean stopflag = false;
+
 
     private TableWindow ()
     {
@@ -26,33 +31,58 @@ public class TableWindow extends JFrame
 
         table.setDefaultRenderer(Object.class, new ColoredTableCellRenderer());
 
-        sl = new SyncList(tableModel, table);
+        this.setLayout(new BorderLayout());
 
-        this.add(new JScrollPane(table));
+        JPanel p = new JPanel();
+        p.add (startButton);
+        p.add (stopButton);
+
+        stopButton.addActionListener(e ->
+        {
+            stopflag = true;
+        });
+
+        startButton.addActionListener((ActionEvent e) ->
+        {
+            startButton.setEnabled(false);
+            listFiller = new SyncList(tableModel, table);
+            new Thread(this::runDirDeleter).start();
+        });
+
+        this.add (p, BorderLayout.NORTH);
+        this.add (new JScrollPane(table), BorderLayout.CENTER);
         this.setTitle("Table Example");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
         this.setVisible(true);
-        runDirDeleter();
-        sl.addRow (pass, "Finished","INFO!", Color.BLUE);
     }
 
     private void runDirDeleter ()
     {
-        pass = 0;
+        int pass = 0;
         for(;;)
         {
             pass++;
             System.out.println("Pass: "+pass);
             File dir = new File("F:\\pron");
-            sl.addRow (pass, "Starting: "+dir.getPath(),"INFO", Color.CYAN);
-            EmptyDirDeleter d = new EmptyDirDeleter(dir, sl, pass);
+            listFiller.addRow (pass, "Starting: "+dir.getPath(),"INFO", Color.CYAN);
+            EmptyDirDeleter d = new EmptyDirDeleter(dir, listFiller, pass, stopButton);
             int dels = d.getDels();
-            sl.addRow (pass, "Files deleted: "+dels,"INFO", Color.MAGENTA);
-            if (dels == 0)
+            listFiller.addRow (pass, "Files deleted: "+dels,"INFO", Color.MAGENTA);
+            if (dels == 0 || stopflag)
             {
-                System.out.println("Finished.");
-                sl.stop();
+                if (stopflag)
+                {
+                    System.out.println("Break");
+                    listFiller.addRow (pass, "Break!","INFO!", Color.RED);
+                }
+                else
+                {
+                    System.out.println("Finished.");
+                    listFiller.addRow (pass, "Finished","INFO!", Color.BLUE);
+                }
+                listFiller.stop();
+                startButton.setEnabled(true);
                 break;
             }
         }

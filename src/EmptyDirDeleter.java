@@ -1,5 +1,5 @@
-import java.awt.Color;
-
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 
 public class EmptyDirDeleter
@@ -12,30 +12,24 @@ public class EmptyDirDeleter
     private int dels;
     private SyncList tab;
     private int pass;
+    private volatile boolean stopFlag = false;
 
-    public EmptyDirDeleter (File dir, SyncList tab, int pass)
+    public EmptyDirDeleter (File dir, SyncList tab, int pass, JButton stopb)
     {
         this.pass = pass;
         this.tab = tab;
         dels = 0;
+        stopb.addActionListener(e ->
+        {
+            stopFlag = true;
+        });
         run(dir);
     }
 
-//    public static void main (String[] args)
-//    {
-//        int pass = 0;
-//        for(;;)
-//        {
-//            pass++;
-//            System.out.println("Pass: "+pass);
-//            EmptyDirDeleter d = new EmptyDirDeleter(new File("C:\\Users\\Administrator\\Desktop"));
-//            if (d.getDels() == 0)
-//                break;
-//        }
-//    }
-
-    public void run (File dir)
+    private void run (File dir)
     {
+        if (stopFlag)
+            return;
         File[] files = dir.listFiles();
         tab.addRow(pass, dir.getPath(), "Begin Scan", Color.ORANGE);
         if (files == null)

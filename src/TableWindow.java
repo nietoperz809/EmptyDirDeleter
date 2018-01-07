@@ -13,6 +13,7 @@ public class TableWindow extends JFrame
 
     private JButton startButton = new JButton("Start");
     private JButton stopButton = new JButton("Stop");
+    private JButton renameButton = new JButton("Invoke Renamer");
     private boolean stopflag = false;
 
 
@@ -36,6 +37,7 @@ public class TableWindow extends JFrame
         JPanel p = new JPanel();
         p.add (startButton);
         p.add (stopButton);
+        p.add (renameButton);
 
         stopButton.addActionListener(e ->
         {
@@ -49,12 +51,31 @@ public class TableWindow extends JFrame
             new Thread(this::runDirDeleter).start();
         });
 
+        renameButton.addActionListener(e ->
+        {
+            renameButton.setEnabled(false);
+            new Thread(this::runRenamer).start();
+        });
+
         this.add (p, BorderLayout.NORTH);
         this.add (new JScrollPane(table), BorderLayout.CENTER);
         this.setTitle("Table Example");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
         this.setVisible(true);
+    }
+
+    private void runRenamer()
+    {
+        try
+        {
+            renamer.MainWnd.main();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        renameButton.setEnabled(true);
     }
 
     private void runDirDeleter ()
@@ -88,8 +109,10 @@ public class TableWindow extends JFrame
         }
     }
 
-    public static void main(String[] args)
+    public static void main(String[] args) throws Exception
     {
+        UIManager.setLookAndFeel(
+                "com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
         new TableWindow();
     }
 }
